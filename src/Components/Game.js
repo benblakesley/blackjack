@@ -85,6 +85,9 @@ export const Game = () =>{
 
     //hook to track dealer score and end game at correct point
     useEffect(()=>{
+        /* this first if statement is to ensure that the dealer only draws
+            when the player has stopped drawing 
+        */
         if(dealerHand.length>1){
         if(getHandValue(dealerHand)>=17){
             setGameOver(true);
@@ -95,25 +98,6 @@ export const Game = () =>{
     }
     },[dealerHand]);
 
-     /*The rule for the dealer playing is that they keep drawing unless their
-    score is between 17 and 21. I.e if they are below 17 then they hit or
-    if they are above 21 then they bust. Otherwise they stand.
-    */
-    // const dealerPlays = async()=>{
-    //     setPlayerPlaying(false);
-    //     let count=getHandValue(dealerHand);
-        
-    //     while(count<17){
-
-    //     let number = await addCardToDealerHand();
-        
-        
-    //     count = count + number;
-        
-    //     console.log(count);
-    //     }
-        
-    // }
 
 
     //hook to track if the game is over and do something when it is
@@ -152,7 +136,9 @@ export const Game = () =>{
             
             <h3 className="text-center">Your Hand - {getHandValue(playerHand)}</h3>
             <Hand cards={playerHand}/>
+            <div className="text-center">
             <PlayAgainButton playAgain={playAgain}/>
+            </div>
         </div>
         )
     }
@@ -182,7 +168,7 @@ export const Game = () =>{
             <Hand cards={playerHand}/>
             
             <div className="row">
-                <div className="col">
+                <div className="col text-end">
             <DrawCardButton hit={addCardToPlayerHand}/>
             </div>
             <div className="col">

@@ -7,7 +7,6 @@ export const Stand = (props)=>{
     }
 
     return(
-        
             <button type="button" className="btn btn-primary" onClick={handleClick}>
                         Stand
             </button>
