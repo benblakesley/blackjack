@@ -20,8 +20,11 @@ export const availableChips = (balance)=>{
     else if(50<=balance&& balance<100){
         return [1,5,10,25,50];
     }
-    else if(100<=balance && balance<1000){
-        return [1,5,10,25,50,100,500]
+    else if(100<=balance && balance<500){
+        return [1,5,10,25,50,100]
+    }
+    else if(500<=balance && balance<1000){
+        return [1,5,10,25,50,100, 500]
     }
     else if(balance >0){
         return [1,5,10,25,50,100, 500, 1000];

@@ -9,6 +9,6 @@ export const Chip = (props)=>{
     }
 
     return(
-        <button type="button" onClick={handleClick}>{props.amount}</button>
+        <button type="button" className="btn btn-dark" onClick={handleClick}>{props.amount}</button>
     )
 }

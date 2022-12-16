@@ -13,6 +13,7 @@ import { SetOfChips } from "./SetOfChips";
 
 
 import { useLocalStorage } from "../HelperFunctions/useLocalStorage";
+import { UndoStake } from "./UndoStake";
 
 export const Game = () =>{
 
@@ -116,6 +117,9 @@ export const Game = () =>{
                 console.log("you won");
                 const newBalance = balance + stake;
                 setBalance(newBalance);
+                if(newBalance>highScore){
+                    setHighScore(newBalance);
+                }
             }
             else if(winner(getHandValue(playerHand),getHandValue(dealerHand))==-1){
                 console.log("you lost");
@@ -135,6 +139,10 @@ export const Game = () =>{
 
     }}, [gameOver]);
 
+    useEffect(()=>{
+        if(playerBankrupt){
+        }
+    }, [playerBankrupt])
     
 
     const deal = ()=>{
@@ -152,6 +160,10 @@ export const Game = () =>{
         }
        }
 
+    const undoStake = ()=>{
+        setStake(0);
+    }
+
        const refreshPage = () =>{
         window.location.reload(false);
        }
@@ -160,7 +172,7 @@ export const Game = () =>{
         return(
             <div>
             <div>You are bankrupt. Unlucky</div>
-            <button type="button" onClick={refreshPage}>Go Home</button>
+            <button type="button" className="btn" onClick={refreshPage}>Go Home</button>
             </div>
         )
     }
@@ -175,6 +187,9 @@ export const Game = () =>{
             
             <h3 className="text-center">Your Hand - {getHandValue(playerHand)}</h3>
             <Hand cards={playerHand}/>
+            <div className="text-center my-5">
+            <UndoStake undoStake={undoStake}/>
+            </div>
             <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
             <div className="text-center my-5">
             <DealButton deal={deal}/>
@@ -187,6 +202,9 @@ export const Game = () =>{
         return(
             <div>
             <StartPage/>
+            <div className="text-center my-5">
+            <UndoStake undoStake={undoStake}/>
+            </div>
             <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
             <div className="text-center my-5">
             <DealButton deal={deal}/>
