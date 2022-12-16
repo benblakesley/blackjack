@@ -30,7 +30,7 @@ export const Game = () =>{
 
     const [balance, setBalance] = useLocalStorage('balance', 1000);
     const [stake, setStake] = useLocalStorage('stake', 0);
-    const [highScore, setHighScore] = useLocalStorage('high score', 0);
+    const [highScore, setHighScore] = useLocalStorage('high score', 1000);
     const [playerBankrupt, setPlayerBankrupt] = useState(false);
 
 
@@ -126,7 +126,7 @@ export const Game = () =>{
                 const newBalance = balance - stake;
                 setBalance(newBalance)
                 if(newBalance==0){
-                    setPlayerBankrupt(true);
+                    setTimeout(()=>setPlayerBankrupt(true), 2000);
                 }
             }
             else if(winner(getHandValue(playerHand), getHandValue(dealerHand))==0){
@@ -139,10 +139,7 @@ export const Game = () =>{
 
     }}, [gameOver]);
 
-    useEffect(()=>{
-        if(playerBankrupt){
-        }
-    }, [playerBankrupt])
+  
     
 
     const deal = ()=>{
@@ -170,9 +167,13 @@ export const Game = () =>{
 
        if(playerBankrupt){
         return(
-            <div>
-            <div>You are bankrupt. Unlucky</div>
-            <button type="button" className="btn" onClick={refreshPage}>Go Home</button>
+            <div className="container">
+            <h1 className="text-center">
+                You are bankrupt. Your record is £{highScore}!
+            </h1>
+            <div className="text-center">
+            <button type="button" className="btn btn-success" onClick={refreshPage}>Home</button>
+            </div>
             </div>
         )
     }
@@ -181,17 +182,22 @@ export const Game = () =>{
     else if(gameOver){
         return(
             <div>
-            <h1 className="text-center my-5">Blackjack</h1>
+            <h1 className="text-center my-2">Blackjack</h1>
             <h3 className="text-center mb-1">Dealer Hand - {getHandValue(dealerHand)}</h3>
             <Hand cards={dealerHand}/>
             
             <h3 className="text-center">Your Hand - {getHandValue(playerHand)}</h3>
             <Hand cards={playerHand}/>
-            <div className="text-center my-5">
+            <div className="text-center mt-2">
+            <div className="text-center mb-2">
+                Balance: £{balance}    Current Stake: £{stake}
+            </div>
             <UndoStake undoStake={undoStake}/>
             </div>
+            <div className="text-center mt-3">
             <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
-            <div className="text-center my-5">
+            </div>
+            <div className="text-center mt-3">
             <DealButton deal={deal}/>
             </div>
         </div>
@@ -201,8 +207,11 @@ export const Game = () =>{
     else if(!gameBeingPlayed){
         return(
             <div>
-            <StartPage/>
+            <StartPage highScore={highScore}/>
             <div className="text-center my-5">
+            <div className="text-center mb-2">
+                Balance: £{balance}    Current Stake: £{stake}
+            </div>
             <UndoStake undoStake={undoStake}/>
             </div>
             <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
@@ -218,8 +227,8 @@ export const Game = () =>{
     
     return(
         <div>
-            <h1 className="text-center my-5">Blackjack</h1>
-            <h3 className="text-center">Dealer Hand - {getHandValue(dealerHand)}</h3>
+            <h1 className="text-center my-2">Blackjack</h1>
+            <h3 className="text-center mb-1">Dealer Hand - {getHandValue(dealerHand)}</h3>
             <Hand cards={dealerHand}/>
            
             <h3 className="text-center mb-1">Your Hand - {getHandValue(playerHand)}</h3>
