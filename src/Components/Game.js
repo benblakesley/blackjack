@@ -5,21 +5,41 @@ import { DrawCardButton } from "./DrawCardButton";
 import { Hand } from "./Hand";
 import { Stand } from "./Stand";
 import { winner } from "../HelperFunctions/winner";
-import { PlayAgainButton } from "./PlayAgainButton";
+import { DealButton } from "./DealButton";
 import { getHandValue } from "../HelperFunctions/getHandValue";
 
+import { StartPage } from "./StartPage";
+import { SetOfChips } from "./SetOfChips";
+
+
+import { useLocalStorage } from "../HelperFunctions/useLocalStorage";
 
 export const Game = () =>{
 
 
+
+    /*We want to store some things in local storage.
+        These will be the user's high score and the users balance
+    */
+
     const [gameOver, setGameOver] = useState(false);
     const [playerHand, setPlayerHand] = useState([]);
     const [dealerHand, setDealerHand] = useState([]);
-    const [playerPlaying, setPlayerPlaying] = useState(true);
-   
+    const [gameBeingPlayed, setGameBeingPlayed] = useState(false);
 
-    
-   
+    const [balance, setBalance] = useLocalStorage('balance', 1000);
+    const [stake, setStake] = useLocalStorage('stake', 0);
+    const [highScore, setHighScore] = useLocalStorage('high score', 0);
+    const [playerBankrupt, setPlayerBankrupt] = useState(false);
+
+
+    useEffect(()=>{
+
+        if(balance==0){
+            setBalance(1000);
+        }
+
+    },[])
    
     const addCardToDealerHand = async()=>{
         const cardPromise = await getCard();
@@ -55,33 +75,18 @@ export const Game = () =>{
        setPlayerHand(oldPlayerHand => [...oldPlayerHand, card]);  
     }
     
- 
-   //when the game starts the player should have 2 cards
-    useEffect(()=>{
-        addCardToPlayerHand().then(addCardToPlayerHand());
-    },[]);
 
-    //when the game starts the dealer should have 2 cards
-    useEffect(()=>{
-        addCardToDealerHand();
-    },[])
-    
-
-   
-  
     // hook to track player score
     //If a player busts then the game is over, the player is no longer playing and the dealer plays
     useEffect(()=>{
-          
-    
         if(getHandValue(playerHand) > 21){
                 setGameOver(true);
-                setPlayerPlaying(false);
                 addCardToDealerHand();
         }
             
         
     },[playerHand]);
+
 
     //hook to track dealer score and end game at correct point
     useEffect(()=>{
@@ -98,36 +103,70 @@ export const Game = () =>{
     }
     },[dealerHand]);
 
-
+    const addToStake = (amount) => {
+        setStake(stake => stake+amount);
+    }
 
     //hook to track if the game is over and do something when it is
     useEffect(()=>{
         if(gameOver){
+            
+           
             if(winner(getHandValue(playerHand), getHandValue(dealerHand))==1){
                 console.log("you won");
+                const newBalance = balance + stake;
+                setBalance(newBalance);
             }
             else if(winner(getHandValue(playerHand),getHandValue(dealerHand))==-1){
                 console.log("you lost");
+                const newBalance = balance - stake;
+                setBalance(newBalance)
+                if(newBalance==0){
+                    setPlayerBankrupt(true);
+                }
             }
             else if(winner(getHandValue(playerHand), getHandValue(dealerHand))==0){
                 console.log("push");
             }
-           
+        
+        setStake(0);
+
+        
+
     }}, [gameOver]);
 
-    const playAgain = ()=>{
+    
+
+    const deal = ()=>{
+        if(stake!=0){
+        setGameBeingPlayed(true);
         setGameOver(false);
         setPlayerHand([]);
         setDealerHand([]);
-        setPlayerPlaying(true);
         addCardToDealerHand();
         addCardToPlayerHand();
         addCardToPlayerHand();
-
+        }
+        else{
+            console.log("You need to set a stake");
+        }
        }
+
+       const refreshPage = () =>{
+        window.location.reload(false);
+       }
+
+       if(playerBankrupt){
+        return(
+            <div>
+            <div>You are bankrupt. Unlucky</div>
+            <button type="button" onClick={refreshPage}>Go Home</button>
+            </div>
+        )
+    }
    
        //when the game is over we re-render with a button to play again
-    if(gameOver){
+    else if(gameOver){
         return(
             <div>
             <h1 className="text-center my-5">Blackjack</h1>
@@ -136,26 +175,27 @@ export const Game = () =>{
             
             <h3 className="text-center">Your Hand - {getHandValue(playerHand)}</h3>
             <Hand cards={playerHand}/>
-            <div className="text-center">
-            <PlayAgainButton playAgain={playAgain}/>
+            <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
+            <div className="text-center my-5">
+            <DealButton deal={deal}/>
             </div>
         </div>
         )
     }
-    //If the player has finished their turn then we re-render without the buttons
-    if(!playerPlaying){
+    
+    else if(!gameBeingPlayed){
         return(
             <div>
-                <h1 className="text-center my-5">Blackjack</h1>
-                <h3 className="text-center mb-1">Dealer Hand - {getHandValue(dealerHand)}</h3>
-                <Hand cards={dealerHand}/>
-                
-                <h3 className="text-center">Your Hand - {getHandValue(playerHand)}</h3>
-                <Hand cards={playerHand}/>
-                
+            <StartPage/>
+            <SetOfChips addToStake={addToStake} balance={balance} stake={stake}/>
+            <div className="text-center my-5">
+            <DealButton deal={deal}/>
+            </div>
             </div>
         )
+
     }
+
     
     
     return(
@@ -179,6 +219,7 @@ export const Game = () =>{
             
         </div>
     )
+
     
 }
 

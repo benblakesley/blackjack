@@ -1,15 +1,15 @@
 
 
 
-export const PlayAgainButton = (props)=>{
+export const DealButton = (props)=>{
 
 
     const handleClick =()=>{
-        props.playAgain()
+        props.deal()
     }
 
 return  <button type="button" className="btn btn-success" onClick={handleClick}>
-                    Play Again
+                    Deal
         </button>
           
     
